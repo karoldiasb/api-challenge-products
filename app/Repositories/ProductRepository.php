@@ -47,7 +47,7 @@ class ProductRepository implements ProductInterface
 
             DB::commit();
 
-            return $this->success("Produtos salvos com sucesso!", 200);
+            return $this->success("Produtos salvos com sucesso!", null);
 
         } catch(\Exception $e) {
             DB::rollBack();
