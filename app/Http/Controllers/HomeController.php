@@ -13,6 +13,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return response('PHP Challenge 20201117', 200);
+        return response()->json('PHP Challenge 20201117', 200);
     }
 }

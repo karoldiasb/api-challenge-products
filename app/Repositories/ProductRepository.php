@@ -4,18 +4,21 @@ namespace App\Repositories;
 
 use App\Http\Requests\ProductRequest;
 use App\Interfaces\ProductInterface;
+use App\Traits\ResponseAPI;
 use App\Models\Product;
 use DB;
 
 class ProductRepository implements ProductInterface
 {
+    use ResponseAPI;
+
     public function getAllProducts()
     {
         try {
             $products = Product::all();
-            return $products;
+            return $this->success("Todos os produtos", $products);
         } catch(\Exception $e) {
-            return response('Products not found.', 404);
+            return $this->error($e->getMessage(), $e->getCode());
         }
     }
 
@@ -23,8 +26,7 @@ class ProductRepository implements ProductInterface
     {
         DB::beginTransaction();
         try {
-            // $contents = file_get_contents(storage_path('app/products.json')); //teste
-
+            
             $contents = file_get_contents($request->file->path());
         
             $arquivos = json_decode($contents);
@@ -45,11 +47,11 @@ class ProductRepository implements ProductInterface
 
             DB::commit();
 
-            return response('Products saved.', 201);
+            return $this->success("Produtos salvos com sucesso!", 200);
 
         } catch(\Exception $e) {
             DB::rollBack();
-            // return response('Cannot save.', 404);
+            return $this->error($e->getMessage(), $e->getCode());
         }
     }
 
@@ -57,7 +59,7 @@ class ProductRepository implements ProductInterface
     {
         try {
             $product = Product::find($id);
-            return $product;
+            return $this->success("Produto {$id}", $product);
         } catch(\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
         }
@@ -69,11 +71,9 @@ class ProductRepository implements ProductInterface
         try {
             $product = Product::find($id);
 
-            // Check the product
             if(!$product) 
                 return response('Not found product.', 404);
 
-            // Update the product
             $product->title = $params->title;
             $product->type = $params->type;
             $product->price = $params->price;
@@ -83,10 +83,11 @@ class ProductRepository implements ProductInterface
 
             DB::commit();
 
-            return response('Product edited.', 200);
+            return $this->success("Produto {$product->title} editado com sucesso!", $product);
             
         } catch(\Exception $e) {
             DB::rollBack();
+            return $this->error($e->getMessage(), $e->getCode());
         }
     }
 
@@ -96,18 +97,16 @@ class ProductRepository implements ProductInterface
         try {
             $product = Product::find($id);
 
-            // Check the product
             if(!$product) 
-                return response('Not found product.', 404);
+                return $this->error('Produto não encontrado', 404);
 
-            // Delete the product
             $product->delete();
 
             DB::commit();
-            return response('Product deleted.', 200);
+            return $this->success("Produto {$product->title} deletado", $product);
             
         } catch(\Exception $e) {
-            DB::rollBack();
+            return $this->error($e->getMessage(), $e->getCode());
         }
     }
 }

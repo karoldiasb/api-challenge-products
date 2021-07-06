@@ -28,7 +28,18 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return response()->json($this->productRepository->getAllProducts());
+        return $this->productRepository->getAllProducts();
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        return $this->productRepository->getProductById($id);
     }
 
     /**
@@ -50,7 +61,7 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        return json_encode($this->productRepository->getProductById($id));
+        return $this->productRepository->getProductById($id);
     }
 
     /**
